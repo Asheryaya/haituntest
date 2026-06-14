@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}我的测评 - 海豚计划四期人才测评系统{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2>欢迎，{{ current_user.name }}！</h2>
+        <p style="color: var(--gray-text); margin-top: 0.5rem;">请完成以下测评，了解您的行为风格与管理潜能</p>
+    </div>
+
+    <div class="dashboard-grid">
+        <!-- DISC行为风格测试 -->
+        <div class="dashboard-card">
+            <div class="icon">🎯</div>
+            <h3>DISC行为风格测试</h3>
+            <p>40道题目，识别您的行为风格特征</p>
+            <p style="color: var(--gray-text); font-size: 0.9rem; margin-top: 0.5rem;">
+                了解您的沟通方式、决策偏好与团队协作特点
+            </p>
+            <div class="status
+                {% if disc_status == 'completed' %}status-completed
+                {% elif disc_status == 'in_progress' %}status-in-progress
+                {% else %}status-not-started{% endif %}">
+                {% if disc_status == 'completed' %}已完成
+                {% elif disc_status == 'in_progress' %}进行中
+                {% else %}未开始{% endif %}
+            </div>
+            <div style="margin-top: 1.5rem;">
+                {% if disc_status == 'completed' %}
+                <a href="{{ url_for('disc_result', assessment_id=disc_assessment_id) }}" class="btn btn-success">查看结果</a>
+                {% elif disc_status == 'in_progress' %}
+                <a href="{{ url_for('disc_test', question=1) }}" class="btn btn-warning">继续答题</a>
+                {% else %}
+                <a href="{{ url_for('disc_start') }}" class="btn btn-primary">开始测试</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 情景模拟测评 -->
+        <div class="dashboard-card">
+            <div class="icon">📋</div>
+            <h3>情景模拟测评</h3>
+            <p>8道情景题，基于真实业务场景</p>
+            <p style="color: var(--gray-text); font-size: 0.9rem; margin-top: 0.5rem;">
+                评估您在复杂情境下的决策思维、协同意识与全局观
+            </p>
+            <div class="status
+                {% if scenario_status == 'completed' %}status-completed
+                {% elif scenario_status == 'in_progress' %}status-in-progress
+                {% else %}status-not-started{% endif %}">
+                {% if scenario_status == 'completed' %}已完成
+                {% elif scenario_status == 'in_progress' %}进行中
+                {% else %}未开始{% endif %}
+            </div>
+            <div style="margin-top: 1.5rem;">
+                {% if scenario_status == 'completed' %}
+                <span class="btn btn-success" style="opacity: 0.7; cursor: default;">已完成</span>
+                {% elif scenario_status == 'in_progress' %}
+                <a href="{{ url_for('scenario_test', question=1) }}" class="btn btn-warning">继续答题</a>
+                {% else %}
+                <a href="{{ url_for('scenario_start') }}" class="btn btn-primary">开始测评</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 培训需求调研 -->
+        <div class="dashboard-card">
+            <div class="icon">💬</div>
+            <h3>培训需求调研</h3>
+            <p>2道开放性问题</p>
+            <p style="color: var(--gray-text); font-size: 0.9rem; margin-top: 0.5rem;">
+                分享您的工作亮点与学习期待
+            </p>
+            <div class="status
+                {% if survey_status == 'completed' %}status-completed
+                {% elif survey_status == 'in_progress' %}status-in-progress
+                {% else %}status-not-started{% endif %}">
+                {% if survey_status == 'completed' %}已完成
+                {% elif survey_status == 'in_progress' %}进行中
+                {% else %}未开始{% endif %}
+            </div>
+            <div style="margin-top: 1.5rem;">
+                {% if survey_status == 'completed' %}
+                <span class="btn btn-success" style="opacity: 0.7; cursor: default;">已完成</span>
+                {% elif survey_status == 'in_progress' %}
+                <a href="{{ url_for('survey_form') }}" class="btn btn-warning">继续填写</a>
+                {% else %}
+                <a href="{{ url_for('survey_start') }}" class="btn btn-primary">开始填写</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2>测评说明</h2>
+    </div>
+    <div style="line-height: 2;">
+        <p>✅ 答案无对错之分，而是了解您的真实行为风格与管理特质。请根据您的第一直觉选择最符合您真实想法的选项。</p>
+        <p>✅ 请按第一印象作答，在答题时建议您快速选择，不要反复思考或过度分析。</p>
+        <p>✅ 答题时间，本次测评预计耗时1小时，请您选择一个安静、不受干扰的时间段，集中精力完成所有题目。</p>
+    </div>
+    <div style="background-color: var(--light-bg); border-radius: 8px; padding: 1.5rem; margin-top: 1.5rem;">
+        <h4 style="color: var(--primary-color); margin-bottom: 1rem;">温馨提示</h4>
+        <ul style="list-style: none; padding: 0;">
+            <li style="padding: 0.3rem 0;">📌 请一次性完成：建议您不要中途退出，一次性完成所有题目，以免影响测评结果的准确性。</li>
+            <li style="padding: 0.3rem 0;">💻 设备准备：请确保您的网络连接稳定，建议使用电脑或平板作答，获得更好的答题体验。</li>
+            <li style="padding: 0.3rem 0;">🔇 环境要求：请在安静的环境下独立完成测评，不受他人干扰。</li>
+            <li style="padding: 0.3rem 0;">🔒 数据保密：您的测评结果将严格保密，仅用于海豚计划四期的培训分析与个性化培养方案制定。</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

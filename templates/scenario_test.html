@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}情景模拟测评 - 第{{ question }}题{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2>定制情景测评</h2>
+    </div>
+
+    <!-- 进度条 -->
+    <div class="progress-bar">
+        <div class="progress" style="width: {{ (question / total * 100)|round }}%"></div>
+        <div class="progress-text">{{ question }} / {{ total }}</div>
+    </div>
+
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <span style="font-size: 1.2rem; color: var(--gray-text);">情景 {{ question }} / 共 {{ total }} 题</span>
+    </div>
+
+    <form method="POST" action="{{ url_for('scenario_test', question=question) }}" id="scenarioForm">
+        <div class="scenario-card">
+            <div class="scenario-header">
+                <h3>{{ scenario_questions[question].title }}</h3>
+            </div>
+            <div class="scenario-body">
+                <div class="scenario-description">
+                    {{ scenario_questions[question].description }}
+                </div>
+
+                <h4 style="color: var(--primary-color); margin-bottom: 1rem;">请选择您的决策：</h4>
+
+                <div class="option-group" id="optionGroup">
+                    {% for letter, text in scenario_questions[question].options.items() %}
+                    <div class="option-item" data-value="{{ letter }}">
+                        <input type="radio" id="option{{ letter }}" name="answer" value="{{ letter }}"
+                            {% if current_answer == letter %}checked{% endif %} required>
+                        <label for="option{{ letter }}">
+                            <span class="option-letter">选项{{ letter }}：</span>
+                            {{ text }}
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-top: 2rem;">
+            <div>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline" style="margin-right: 1rem;">返回仪表板</a>
+                {% if question > 1 %}
+                <button type="button" onclick="saveAndGoBack({{ question - 1 }})" class="btn btn-outline">上一题</button>
+                {% endif %}
+            </div>
+
+            <div>
+                {% if question < total %}
+                <button type="submit" class="btn btn-primary" id="nextBtn">下一题</button>
+                {% else %}
+                <button type="submit" class="btn btn-success btn-lg" id="nextBtn">完成测评</button>
+                {% endif %}
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+(function() {
+    // 当前题目和总题数
+    var currentQuestion = {{ question }};
+    var totalQuestions = {{ total }};
+    var isLastQuestion = (currentQuestion >= totalQuestions);
+    var isProcessing = false;
+
+    // 获取所有选项
+    var optionItems = document.querySelectorAll('#optionGroup .option-item');
+
+    optionItems.forEach(function(item) {
+        item.addEventListener('click', function() {
+            // 防止重复点击
+            if (isProcessing) return;
+
+            // 获取选项值
+            var value = this.getAttribute('data-value');
+            var radio = this.querySelector('input[type="radio"]');
+            if (radio) {
+                radio.checked = true;
+            }
+
+            // 如果是最后一题，只选中不跳转
+            if (isLastQuestion) {
+                return;
+            }
+
+            // 标记处理中
+            isProcessing = true;
+
+            // 显示保存状态
+            var nextBtn = document.getElementById('nextBtn');
+            if (nextBtn) {
+                nextBtn.textContent = '保存中...';
+                nextBtn.disabled = true;
+            }
+
+            // 保存答案
+            var form = document.getElementById('scenarioForm');
+            var formData = new FormData(form);
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(function(response) {
+                if (response.ok) {
+                    // 保存成功，跳转到下一题
+                    window.location.href = '/scenario/test/' + (currentQuestion + 1);
+                } else {
+                    throw new Error('保存失败');
+                }
+            })
+            .catch(function(error) {
+                isProcessing = false;
+                if (nextBtn) {
+                    nextBtn.textContent = '下一题';
+                    nextBtn.disabled = false;
+                }
+                alert('保存失败，请重试');
+            });
+        });
+    });
+
+    // 返回上一题
+    window.saveAndGoBack = function(prevQuestion) {
+        var selectedAnswer = document.querySelector('input[name="answer"]:checked');
+
+        if (selectedAnswer) {
+            var formData = new FormData();
+            formData.append('answer', selectedAnswer.value);
+
+            fetch(window.location.href, {
+                method: 'POST',
+                body: formData
+            }).then(function() {
+                window.location.href = '/scenario/test/' + prevQuestion;
+            }).catch(function() {
+                window.location.href = '/scenario/test/' + prevQuestion;
+            });
+        } else {
+            window.location.href = '/scenario/test/' + prevQuestion;
+        }
+    };
+})();
+</script>
+{% endblock %}

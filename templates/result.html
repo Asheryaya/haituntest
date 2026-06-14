@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}DISC测评结果{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2>🎯 DISC行为风格测评结果</h2>
+    </div>
+
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <h3 style="color: var(--primary-color); font-size: 1.8rem;">
+            您的主要行为风格：{{ analysis.primary_name }}
+        </h3>
+        {% if analysis.secondary_type %}
+        <p style="color: var(--gray-text); margin-top: 0.5rem;">
+            次要风格：{{ analysis.secondary_name }}
+        </p>
+        {% endif %}
+    </div>
+
+    <!-- DISC分数图表 -->
+    <div class="disc-chart">
+        <div class="disc-bar">
+            <div class="bar-container">
+                <div class="bar d-bar" style="height: {{ (analysis.scores.D / 40 * 100)|round }}%"></div>
+            </div>
+            <div class="score">{{ analysis.scores.D }}</div>
+            <div class="label">D 支配型</div>
+        </div>
+        <div class="disc-bar">
+            <div class="bar-container">
+                <div class="bar i-bar" style="height: {{ (analysis.scores.I / 40 * 100)|round }}%"></div>
+            </div>
+            <div class="score">{{ analysis.scores.I }}</div>
+            <div class="label">I 影响型</div>
+        </div>
+        <div class="disc-bar">
+            <div class="bar-container">
+                <div class="bar s-bar" style="height: {{ (analysis.scores.S / 40 * 100)|round }}%"></div>
+            </div>
+            <div class="score">{{ analysis.scores.S }}</div>
+            <div class="label">S 稳健型</div>
+        </div>
+        <div class="disc-bar">
+            <div class="bar-container">
+                <div class="bar c-bar" style="height: {{ (analysis.scores.C / 40 * 100)|round }}%"></div>
+            </div>
+            <div class="score">{{ analysis.scores.C }}</div>
+            <div class="label">C 尽责型</div>
+        </div>
+    </div>
+
+    <!-- 详细分析 -->
+    <div class="analysis-section">
+        <h4>📊 行为特征</h4>
+        <p>{{ analysis.primary_characteristics }}</p>
+    </div>
+
+    <div class="analysis-section">
+        <h4>💪 核心优势</h4>
+        <ul>
+            {% for strength in analysis.primary_strengths.split('、') %}
+            <li>{{ strength }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="analysis-section">
+        <h4>📈 提升方向</h4>
+        <ul>
+            {% for improvement in analysis.primary_improvements.split('、') %}
+            <li>{{ improvement }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="analysis-section">
+        <h4>💬 沟通建议</h4>
+        <p>{{ analysis.primary_communication }}</p>
+    </div>
+
+    {% if analysis.secondary_type %}
+    <div class="analysis-section">
+        <h4>🔄 次要风格特征</h4>
+        <p>{{ analysis.secondary_characteristics }}</p>
+    </div>
+    {% endif %}
+
+    <div style="text-align: center; margin-top: 2rem;">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-primary">返回仪表盘</a>
+    </div>
+</div>
+
+<!-- DISC类型说明 -->
+<div class="card">
+    <div class="card-header">
+        <h2>📖 DISC四种类型说明</h2>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
+        <div class="analysis-section" style="border-left: 4px solid #FF6B6B;">
+            <h4>D - 支配型 (Dominance)</h4>
+            <p>直接、果断、有竞争力、以结果为导向</p>
+        </div>
+        <div class="analysis-section" style="border-left: 4px solid #FFC000;">
+            <h4>I - 影响型 (Influence)</h4>
+            <p>热情、乐观、善于社交、有感染力</p>
+        </div>
+        <div class="analysis-section" style="border-left: 4px solid #70AD47;">
+            <h4>S - 稳健型 (Steadiness)</h4>
+            <p>耐心、稳定、可靠、善于倾听</p>
+        </div>
+        <div class="analysis-section" style="border-left: 4px solid #5B9BD5;">
+            <h4>C - 尽责型 (Conscientiousness)</h4>
+            <p>严谨、精确、有条理、追求完美</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}管理后台 - 海豚计划四期人才测评系统{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2>📊 管理后台</h2>
+        <p style="color: var(--gray-text); margin-top: 0.5rem;">海豚计划四期人才测评系统数据概览</p>
+    </div>
+
+    <!-- 统计卡片 -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.total_users }}</div>
+            <div class="stat-label">总用户数</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.completed_assessments }}</div>
+            <div class="stat-label">已完成测评</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.in_progress_assessments }}</div>
+            <div class="stat-label">进行中测评</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.not_started_users }}</div>
+            <div class="stat-label">未开始测评</div>
+        </div>
+    </div>
+
+    <!-- 完成率 -->
+    <div style="margin-bottom: 2rem;">
+        <h3 style="color: var(--primary-color); margin-bottom: 1rem;">📈 各部分完成率</h3>
+
+        <div style="margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span>DISC行为风格测试</span>
+                <span>{{ stats.disc_completion_rate|round(1) }}%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress" style="width: {{ stats.disc_completion_rate }}%"></div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span>情景模拟测评</span>
+                <span>{{ stats.scenario_completion_rate|round(1) }}%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress" style="width: {{ stats.scenario_completion_rate }}%"></div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span>培训需求调研</span>
+                <span>{{ stats.survey_completion_rate|round(1) }}%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress" style="width: {{ stats.survey_completion_rate }}%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DISC类型分布 -->
+    <div>
+        <h3 style="color: var(--primary-color); margin-bottom: 1rem;">🎯 DISC类型分布</h3>
+
+        <div class="disc-chart">
+            <div class="disc-bar">
+                <div class="bar-container">
+                    <div class="bar d-bar" style="height: {{ (stats.disc_distribution.D / stats.total_users * 100) if stats.total_users > 0 else 0 }}%"></div>
+                </div>
+                <div class="score">{{ stats.disc_distribution.D }}</div>
+                <div class="label">D 支配型</div>
+            </div>
+            <div class="disc-bar">
+                <div class="bar-container">
+                    <div class="bar i-bar" style="height: {{ (stats.disc_distribution.I / stats.total_users * 100) if stats.total_users > 0 else 0 }}%"></div>
+                </div>
+                <div class="score">{{ stats.disc_distribution.I }}</div>
+                <div class="label">I 影响型</div>
+            </div>
+            <div class="disc-bar">
+                <div class="bar-container">
+                    <div class="bar s-bar" style="height: {{ (stats.disc_distribution.S / stats.total_users * 100) if stats.total_users > 0 else 0 }}%"></div>
+                </div>
+                <div class="score">{{ stats.disc_distribution.S }}</div>
+                <div class="label">S 稳健型</div>
+            </div>
+            <div class="disc-bar">
+                <div class="bar-container">
+                    <div class="bar c-bar" style="height: {{ (stats.disc_distribution.C / stats.total_users * 100) if stats.total_users > 0 else 0 }}%"></div>
+                </div>
+                <div class="score">{{ stats.disc_distribution.C }}</div>
+                <div class="label">C 尽责型</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 快捷操作 -->
+<div class="card">
+    <div class="card-header">
+        <h2>⚡ 快捷操作</h2>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+        <a href="{{ url_for('admin_users') }}" class="btn btn-primary" style="padding: 1.5rem;">
+            👥 用户管理
+        </a>
+        <a href="{{ url_for('admin_results') }}" class="btn btn-success" style="padding: 1.5rem;">
+            📋 测评结果
+        </a>
+        <a href="{{ url_for('admin_export', export_type='users') }}" class="btn btn-outline" style="padding: 1.5rem;">
+            📥 导出用户列表
+        </a>
+        <a href="{{ url_for('admin_export', export_type='disc') }}" class="btn btn-outline" style="padding: 1.5rem;">
+            📥 导出DISC结果
+        </a>
+        <a href="{{ url_for('admin_export', export_type='scenario') }}" class="btn btn-outline" style="padding: 1.5rem;">
+            📥 导出情景测评
+        </a>
+        <a href="{{ url_for('admin_export', export_type='survey') }}" class="btn btn-outline" style="padding: 1.5rem;">
+            📥 导出培训调研
+        </a>
+    </div>
+</div>
+{% endblock %}

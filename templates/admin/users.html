@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}用户管理 - 管理后台{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2>👥 用户管理</h2>
+        <a href="{{ url_for('admin_export', export_type='users') }}" class="btn btn-outline">
+            📥 导出Excel
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>用户名</th>
+                    <th>姓名</th>
+                    <th>部门</th>
+                    <th>角色</th>
+                    <th>注册时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.department or '-' }}</td>
+                    <td>
+                        {% if user.role == 'admin' %}
+                        <span class="badge" style="background-color: var(--warning-color); color: var(--dark-text);">管理员</span>
+                        {% else %}
+                        <span class="badge" style="background-color: var(--secondary-color); color: white;">普通用户</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ user.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>
+                        {% if user.role != 'admin' %}
+                        <form method="POST" action="{{ url_for('admin_delete_user', user_id=user.id) }}"
+                              style="display: inline;"
+                              onsubmit="return confirm('确定要删除用户 {{ user.name }} 吗？此操作不可恢复。');">
+                            <button type="submit" class="btn btn-danger btn-sm">删除</button>
+                        </form>
+                        {% else %}
+                        <span style="color: var(--gray-text);">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div style="margin-top: 1rem; color: var(--gray-text);">
+        共 {{ users|length }} 个用户
+    </div>
+</div>
+{% endblock %}

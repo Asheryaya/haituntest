@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}培训需求调研{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2>培训需求调研</h2>
+        <p style="color: var(--gray-text); margin-top: 0.5rem;">请认真填写以下问题，帮助我们更好地为您定制培训内容</p>
+    </div>
+
+    <form method="POST" action="{{ url_for('survey_form') }}" id="surveyForm">
+        <div class="scenario-card" style="margin-bottom: 2rem;">
+            <div class="scenario-header">
+                <h3>问题一</h3>
+            </div>
+            <div class="scenario-body">
+                <p style="margin-bottom: 1rem; font-weight: 500;">
+                    介绍最擅长的一个工作亮点，如果把这项工作亮点开发成一门微课进行全员分享，打算开发什么课题？
+                </p>
+                <div class="form-group">
+                    <textarea name="answer1" class="form-control" rows="6" placeholder="请详细描述您的工作亮点和计划开发的微课课题..." required>{{ saved_answers.get(1, '') }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="scenario-card" style="margin-bottom: 2rem;">
+            <div class="scenario-header">
+                <h3>问题二</h3>
+            </div>
+            <div class="scenario-body">
+                <p style="margin-bottom: 1rem; font-weight: 500;">
+                    聊聊对本次学习最大的一个期待是什么？
+                </p>
+                <div class="form-group">
+                    <textarea name="answer2" class="form-control" rows="6" placeholder="请描述您对本次培训的期待..." required>{{ saved_answers.get(2, '') }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-top: 2rem;">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-outline">返回仪表板</a>
+            <button type="submit" class="btn btn-success btn-lg" id="submitBtn">提交调研</button>
+        </div>
+    </form>
+</div>
+
+<script>
+// 表单提交时显示加载状态
+document.getElementById('surveyForm').addEventListener('submit', function() {
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.textContent = '提交中...';
+    submitBtn.disabled = true;
+});
+</script>
+{% endblock %}

@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}测评结果 - 管理后台{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2>📋 测评结果</h2>
+        <div>
+            <a href="{{ url_for('admin_export', export_type='disc') }}" class="btn btn-outline btn-sm">导出DISC</a>
+            <a href="{{ url_for('admin_export', export_type='scenario') }}" class="btn btn-outline btn-sm">导出情景</a>
+            <a href="{{ url_for('admin_export', export_type='survey') }}" class="btn btn-outline btn-sm">导出调研</a>
+        </div>
+    </div>
+
+    <!-- 筛选选项 -->
+    <div style="margin-bottom: 1.5rem;">
+        <button class="btn btn-primary btn-sm filter-btn active" data-type="all">全部</button>
+        <button class="btn btn-outline btn-sm filter-btn" data-type="disc">DISC测评</button>
+        <button class="btn btn-outline btn-sm filter-btn" data-type="scenario">情景测评</button>
+        <button class="btn btn-outline btn-sm filter-btn" data-type="survey">培训调研</button>
+    </div>
+
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>用户</th>
+                    <th>部门</th>
+                    <th>测评类型</th>
+                    <th>完成时间</th>
+                    <th>详情</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in results %}
+                <tr class="result-row" data-type="{{ item.type }}">
+                    <td>{{ item.user.name }}</td>
+                    <td>{{ item.user.department or '-' }}</td>
+                    <td>
+                        {% if item.type == 'disc' %}
+                        <span class="badge" style="background-color: #FF6B6B; color: white;">DISC行为风格</span>
+                        {% elif item.type == 'scenario' %}
+                        <span class="badge" style="background-color: #FFC000; color: var(--dark-text);">情景模拟</span>
+                        {% elif item.type == 'survey' %}
+                        <span class="badge" style="background-color: #70AD47; color: white;">培训调研</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ item.assessment.completed_at.strftime('%Y-%m-%d %H:%M') if item.assessment.completed_at else '-' }}</td>
+                    <td>
+                        {% if item.type == 'disc' and item.disc_result %}
+                        <a href="{{ url_for('disc_result', assessment_id=item.assessment.id) }}" class="btn btn-sm btn-outline">查看报告</a>
+                        {% else %}
+                        <span style="color: var(--gray-text);">已完成</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div style="margin-top: 1rem; color: var(--gray-text);">
+        共 {{ results|length }} 条记录
+    </div>
+</div>
+
+<script>
+// 筛选功能
+document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        // 更新按钮状态
+        document.querySelectorAll('.filter-btn').forEach(b => {
+            b.classList.remove('active', 'btn-primary');
+            b.classList.add('btn-outline');
+        });
+        this.classList.add('active', 'btn-primary');
+        this.classList.remove('btn-outline');
+
+        const type = this.dataset.type;
+        document.querySelectorAll('.result-row').forEach(row => {
+            if (type === 'all' || row.dataset.type === type) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
