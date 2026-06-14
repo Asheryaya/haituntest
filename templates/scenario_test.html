@@ -38,9 +38,6 @@
                         <label for="option{{ letter }}">
                             <span class="option-letter">选项{{ letter }}：</span>
                             {{ text }}
-                            <span class="scenario-tag" style="background-color: {% if letter == 'A' %}#FF6B6B{% elif letter == 'B' %}#FFC000{% elif letter == 'C' %}#5B9BD5{% else %}#70AD47{% endif %}; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; margin-left: 10px;">
-                                {% if letter == 'A' %}激进执行类{% elif letter == 'B' %}业务攻坚/一线高潜力{% elif letter == 'C' %}专业骨干/职能管理{% else %}潜力综合管理{% endif %}
-                            </span>
                         </label>
                     </div>
                     {% endfor %}
