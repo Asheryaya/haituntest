@@ -1,25 +1,38 @@
 {% extends "base.html" %}
 
-{% block title %}DISC测评结果{% endblock %}
+{% block title %}DISC行为风格测评报告{% endblock %}
 
 {% block content %}
-<div class="card">
+<!-- 报告头部 -->
+<div class="card" style="background: linear-gradient(135deg, {{ analysis.primary_color }}22, {{ analysis.primary_color }}11);">
     <div class="card-header">
-        <h2>🎯 DISC行为风格测评结果</h2>
+        <h2>{{ analysis.primary_icon }} DISC行为风格测评报告</h2>
+        <p style="color: var(--gray-text); margin-top: 0.5rem;">基于40题标准DISC行为风格测评</p>
     </div>
 
     <div style="text-align: center; margin-bottom: 2rem;">
-        <h3 style="color: var(--primary-color); font-size: 1.8rem;">
-            您的主要行为风格：{{ analysis.primary_name }}
+        <div style="font-size: 4rem; margin-bottom: 1rem;">{{ analysis.primary_icon }}</div>
+        <h3 style="color: {{ analysis.primary_color }}; font-size: 2rem; margin-bottom: 0.5rem;">
+            {{ analysis.primary_nickname }}
         </h3>
+        <p style="font-size: 1.3rem; color: var(--gray-text);">
+            核心关键词：{{ analysis.primary_keyword }}
+        </p>
         {% if analysis.secondary_type %}
         <p style="color: var(--gray-text); margin-top: 0.5rem;">
-            次要风格：{{ analysis.secondary_name }}
+            次要风格：{{ analysis.secondary_nickname }}（{{ analysis.secondary_keyword }}）
         </p>
         {% endif %}
     </div>
+</div>
 
-    <!-- DISC分数图表 -->
+<!-- 行为状态图 -->
+<div class="card">
+    <div class="card-header">
+        <h2>📊 行为状态图</h2>
+        <p style="color: var(--gray-text);">40题累计得分分布（总分40分）</p>
+    </div>
+
     <div class="disc-chart">
         <div class="disc-bar">
             <div class="bar-container">
@@ -51,51 +64,129 @@
         </div>
     </div>
 
-    <!-- 详细分析 -->
-    <div class="analysis-section">
-        <h4>📊 行为特征</h4>
-        <p>{{ analysis.primary_characteristics }}</p>
-    </div>
-
-    <div class="analysis-section">
-        <h4>💪 核心优势</h4>
-        <ul>
-            {% for strength in analysis.primary_strengths.split('、') %}
-            <li>{{ strength }}</li>
-            {% endfor %}
-        </ul>
-    </div>
-
-    <div class="analysis-section">
-        <h4>📈 提升方向</h4>
-        <ul>
-            {% for improvement in analysis.primary_improvements.split('、') %}
-            <li>{{ improvement }}</li>
-            {% endfor %}
-        </ul>
-    </div>
-
-    <div class="analysis-section">
-        <h4>💬 沟通建议</h4>
-        <p>{{ analysis.primary_communication }}</p>
-    </div>
-
-    {% if analysis.secondary_type %}
-    <div class="analysis-section">
-        <h4>🔄 次要风格特征</h4>
-        <p>{{ analysis.secondary_characteristics }}</p>
-    </div>
-    {% endif %}
-
-    <div style="text-align: center; margin-top: 2rem;">
-        <a href="{{ url_for('dashboard') }}" class="btn btn-primary">返回仪表盘</a>
+    <div style="background-color: var(--light-bg); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+        <p style="color: var(--gray-text); text-align: center;">
+            💡 此图展示了您在自然状态和工作压力状态下的行为偏好分布
+        </p>
     </div>
 </div>
 
-<!-- 每道题的选择详情 -->
+<!-- 核心风格书写 -->
+<div class="card">
+    <div class="card-header">
+        <h2>{{ analysis.primary_icon }} 核心风格书写</h2>
+    </div>
+
+    <div style="background-color: {{ analysis.primary_color }}11; padding: 1.5rem; border-radius: 8px; border-left: 4px solid {{ analysis.primary_color }};">
+        <h4 style="color: {{ analysis.primary_color }}; margin-bottom: 1rem;">{{ analysis.primary_name }}</h4>
+        <p style="line-height: 1.8; font-size: 1.05rem;">
+            您的核心行为风格是<strong>{{ analysis.primary_keyword }}</strong>。
+            {% if analysis.primary_type == 'D' %}
+            您是一个目标驱动、掌控全局的人，善于推动结果，在团队中往往扮演领导者的角色。
+            {% elif analysis.primary_type == 'I' %}
+            您是一个社交达人、热情感染的人，善于激励他人，在团队中往往扮演气氛营造者的角色。
+            {% elif analysis.primary_type == 'S' %}
+            您是一个稳定可靠、团队支柱的人，善于倾听支持，在团队中往往扮演协调者的角色。
+            {% else %}
+            您是一个严谨精确、追求完美的人，善于分析规划，在团队中往往扮演专业顾问的角色。
+            {% endif %}
+        </p>
+    </div>
+</div>
+
+<!-- 职业效能与盲区分析 -->
+<div class="card">
+    <div class="card-header">
+        <h2>💼 职业效能与盲区分析</h2>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+        <!-- 效能优势 -->
+        <div style="background-color: #f0fff0; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #70AD47;">
+            <h4 style="color: #70AD47; margin-bottom: 1rem;">✅ 效能优势</h4>
+            <ul style="list-style: none; padding: 0;">
+                {% for strength in analysis.primary_strengths %}
+                <li style="padding: 0.5rem 0; border-bottom: 1px solid #e0e0e0;">
+                    • {{ strength }}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- 效能盲区 -->
+        <div style="background-color: #fff5f5; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #FF6B6B;">
+            <h4 style="color: #FF6B6B; margin-bottom: 1rem;">⚠️ 效能盲区</h4>
+            <ul style="list-style: none; padding: 0;">
+                {% for blind_spot in analysis.primary_blind_spots %}
+                <li style="padding: 0.5rem 0; border-bottom: 1px solid #e0e0e0;">
+                    • {{ blind_spot }}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- 相处与沟通说明书 -->
+<div class="card">
+    <div class="card-header">
+        <h2>🤝 相处与沟通说明书</h2>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+        <!-- 如何跟TA沟通 -->
+        <div style="background-color: #f0f8ff; padding: 1.5rem; border-radius: 8px;">
+            <h4 style="color: #5B9BD5; margin-bottom: 1rem;">💬 如何跟TA沟通</h4>
+            <p style="line-height: 1.8;">{{ analysis.primary_communication }}</p>
+        </div>
+
+        <!-- 如何激励TA -->
+        <div style="background-color: #fff8f0; padding: 1.5rem; border-radius: 8px;">
+            <h4 style="color: #FFC000; margin-bottom: 1rem;">🎯 如何激励TA</h4>
+            <p style="line-height: 1.8;">{{ analysis.primary_motivation }}</p>
+        </div>
+    </div>
+</div>
+
+<!-- 针对性发展计划 -->
+<div class="card">
+    <div class="card-header">
+        <h2>📈 针对性发展计划</h2>
+    </div>
+
+    <div style="background-color: {{ analysis.primary_color }}11; padding: 1.5rem; border-radius: 8px;">
+        <h4 style="color: {{ analysis.primary_color }}; margin-bottom: 1rem;">{{ analysis.primary_name }}发展建议</h4>
+        <div style="line-height: 1.8;">
+            <p>{{ analysis.primary_development }}</p>
+        </div>
+    </div>
+</div>
+
+{% if analysis.secondary_type %}
+<!-- 次要风格分析 -->
+<div class="card">
+    <div class="card-header">
+        <h2>🔄 次要风格分析</h2>
+    </div>
+
+    <div style="background-color: {{ analysis.secondary_color }}11; padding: 1.5rem; border-radius: 8px; border-left: 4px solid {{ analysis.secondary_color }};">
+        <h4 style="color: {{ analysis.secondary_color }}; margin-bottom: 1rem;">{{ analysis.secondary_name }}</h4>
+        <p style="margin-bottom: 1rem;">{{ analysis.secondary_keyword }}</p>
+        <h5 style="margin-bottom: 0.5rem;">次要优势：</h5>
+        <ul style="list-style: none; padding: 0;">
+            {% for strength in analysis.secondary_strengths[:3] %}
+            <li style="padding: 0.3rem 0;">• {{ strength }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endif %}
+
+<!-- 答题详情 -->
 <div class="card">
     <div class="card-header">
         <h2>📝 答题详情</h2>
+        <p style="color: var(--gray-text);">您在每道题的选择及其对应的DISC类型</p>
     </div>
 
     <div style="line-height: 2;">
@@ -126,21 +217,25 @@
 
     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
         <div class="analysis-section" style="border-left: 4px solid #FF6B6B;">
-            <h4>D - 支配型 (Dominance)</h4>
-            <p>直接、果断、有竞争力、以结果为导向</p>
+            <h4>🔥 D - 支配型 (Dominance)</h4>
+            <p>目标驱动、掌控全局、决策迅速、领导力强</p>
         </div>
         <div class="analysis-section" style="border-left: 4px solid #FFC000;">
-            <h4>I - 影响型 (Influence)</h4>
-            <p>热情、乐观、善于社交、有感染力</p>
+            <h4>✨ I - 影响型 (Influence)</h4>
+            <p>社交达人、热情感染、善于激励、创意丰富</p>
         </div>
         <div class="analysis-section" style="border-left: 4px solid #70AD47;">
-            <h4>S - 稳健型 (Steadiness)</h4>
-            <p>耐心、稳定、可靠、善于倾听</p>
+            <h4>🌿 S - 稳健型 (Steadiness)</h4>
+            <p>稳定可靠、团队支柱、善于倾听、执行力强</p>
         </div>
         <div class="analysis-section" style="border-left: 4px solid #5B9BD5;">
-            <h4>C - 尽责型 (Conscientiousness)</h4>
-            <p>严谨、精确、有条理、追求完美</p>
+            <h4>💎 C - 尽责型 (Conscientiousness)</h4>
+            <p>严谨精确、追求完美、分析能力强、专业度高</p>
         </div>
     </div>
+</div>
+
+<div style="text-align: center; margin-top: 2rem;">
+    <a href="{{ url_for('dashboard') }}" class="btn btn-primary">返回仪表盘</a>
 </div>
 {% endblock %}
