@@ -3,7 +3,7 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from datetime import datetime
 from config import Config
 from models import db, User, Assessment, DISCAnswer, ScenarioAnswer, SurveyAnswer, DISCResult
-from utils.scoring import calculate_disc_scores, get_disc_result, get_disc_analysis
+from utils.scoring import calculate_disc_scores, get_disc_result, get_disc_analysis, DISC_SCORING_MAP, DISC_LABEL_INFO, SCENARIO_LABEL_INFO
 from utils.export import (export_users_to_excel, export_disc_results_to_excel,
                           export_scenario_results_to_excel, export_survey_results_to_excel,
                           get_statistics)
@@ -109,6 +109,7 @@ def dashboard():
                          disc_status=disc_assessment.status if disc_assessment else 'not_started',
                          disc_assessment_id=disc_assessment.id if disc_assessment else None,
                          scenario_status=scenario_assessment.status if scenario_assessment else 'not_started',
+                         scenario_assessment_id=scenario_assessment.id if scenario_assessment else None,
                          survey_status=survey_assessment.status if survey_assessment else 'not_started')
 
 # ==================== DISC测评路由 ====================
@@ -245,7 +246,14 @@ def disc_result(assessment_id):
         'C': assessment.disc_result.c_score
     })
 
-    return render_template('result.html', assessment=assessment, analysis=analysis)
+    # 获取每道题的答案
+    disc_answers = DISCAnswer.query.filter_by(assessment_id=assessment.id).all()
+    answers_detail = {}
+    for ans in disc_answers:
+        answers_detail[ans.question_number] = ans.answer
+
+    return render_template('result.html', assessment=assessment, analysis=analysis,
+                          answers_detail=answers_detail, disc_scoring_map=DISC_SCORING_MAP)
 
 # ==================== 情景测评路由 ====================
 
@@ -304,7 +312,7 @@ def scenario_test(question):
                 assessment.completed_at = datetime.utcnow()
                 db.session.commit()
                 flash('情景测评已完成！', 'success')
-                return redirect(url_for('dashboard'))
+                return redirect(url_for('scenario_result', assessment_id=assessment.id))
 
             return redirect(url_for('scenario_test', question=question + 1))
 
@@ -316,6 +324,35 @@ def scenario_test(question):
                          question=question,
                          total=8,
                          current_answer=current_answer.answer if current_answer else None)
+
+@app.route('/scenario/result/<int:assessment_id>')
+@login_required
+def scenario_result(assessment_id):
+    assessment = Assessment.query.get_or_404(assessment_id)
+
+    # 权限检查
+    if assessment.user_id != current_user.id and not current_user.is_admin():
+        flash('无权访问', 'error')
+        return redirect(url_for('dashboard'))
+
+    if assessment.status != 'completed':
+        flash('测评未完成', 'warning')
+        return redirect(url_for('dashboard'))
+
+    # 获取每道题的答案
+    scenario_answers = ScenarioAnswer.query.filter_by(assessment_id=assessment.id).all()
+    answers = {}
+    for ans in scenario_answers:
+        answers[ans.scenario_number] = ans.answer
+
+    # 计算得分
+    from utils.scoring import calculate_scenario_scores, get_scenario_analysis
+    scores = calculate_scenario_scores(answers)
+    analysis = get_scenario_analysis(scores)
+
+    return render_template('scenario_result.html', assessment=assessment,
+                          analysis=analysis, answers=answers,
+                          scenario_questions=SCENARIO_QUESTIONS)
 
 # ==================== 培训需求调研路由 ====================
 
@@ -1034,7 +1071,10 @@ SCENARIO_QUESTIONS = {
 def inject_questions():
     return {
         'disc_questions': DISC_QUESTIONS,
-        'scenario_questions': SCENARIO_QUESTIONS
+        'scenario_questions': SCENARIO_QUESTIONS,
+        'disc_scoring_map': DISC_SCORING_MAP,
+        'disc_label_info': DISC_LABEL_INFO,
+        'scenario_label_info': SCENARIO_LABEL_INFO
     }
 
 if __name__ == '__main__':

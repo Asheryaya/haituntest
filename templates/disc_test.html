@@ -32,6 +32,9 @@
                         <label for="option{{ letter }}">
                             <span class="option-letter">{{ letter }}.</span>
                             {{ text }}
+                            <span class="disc-tag" style="background-color: {% if disc_scoring_map[question][letter] == 'D' %}#FF6B6B{% elif disc_scoring_map[question][letter] == 'I' %}#FFC000{% elif disc_scoring_map[question][letter] == 'S' %}#70AD47{% else %}#5B9BD5{% endif %}; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; margin-left: 10px;">
+                                {{ disc_scoring_map[question][letter] }}型
+                            </span>
                         </label>
                     </div>
                     {% endfor %}

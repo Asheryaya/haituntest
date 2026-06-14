@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}情景模拟测评结果{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2>🎯 情景模拟测评结果</h2>
+    </div>
+
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <h3 style="color: var(--primary-color); font-size: 1.8rem;">
+            您的人才类型：{{ analysis.talent_type }}
+        </h3>
+        <p style="color: var(--gray-text); margin-top: 0.5rem;">
+            {{ analysis.talent_description }}
+        </p>
+    </div>
+
+    <!-- 分数图表 -->
+    <div class="disc-chart">
+        <div class="disc-bar">
+            <div class="bar-container">
+                <div class="bar" style="height: {{ (analysis.scores.A / 8 * 100)|round }}%; background-color: #FF6B6B;"></div>
+            </div>
+            <div class="score">{{ analysis.scores.A }}</div>
+            <div class="label">A 激进执行类</div>
+        </div>
+        <div class="disc-bar">
+            <div class="bar-container">
+                <div class="bar" style="height: {{ (analysis.scores.B / 8 * 100)|round }}%; background-color: #FFC000;"></div>
+            </div>
+            <div class="score">{{ analysis.scores.B }}</div>
+            <div class="label">B 业务攻坚/一线高潜力</div>
+        </div>
+        <div class="disc-bar">
+            <div class="bar-container">
+                <div class="bar" style="height: {{ (analysis.scores.C / 8 * 100)|round }}%; background-color: #5B9BD5;"></div>
+            </div>
+            <div class="score">{{ analysis.scores.C }}</div>
+            <div class="label">C 专业骨干/职能管理</div>
+        </div>
+        <div class="disc-bar">
+            <div class="bar-container">
+                <div class="bar" style="height: {{ (analysis.scores.D / 8 * 100)|round }}%; background-color: #70AD47;"></div>
+            </div>
+            <div class="score">{{ analysis.scores.D }}</div>
+            <div class="label">D 潜力综合管理</div>
+        </div>
+    </div>
+</div>
+
+<!-- 每道题的选择详情 -->
+<div class="card">
+    <div class="card-header">
+        <h2>📝 答题详情</h2>
+    </div>
+
+    <div style="line-height: 2;">
+        {% for q_num in range(1, 9) %}
+        <div style="margin-bottom: 1.5rem; padding: 1rem; background-color: var(--light-bg); border-radius: 8px;">
+            <h4 style="color: var(--primary-color); margin-bottom: 0.5rem;">
+                {{ scenario_questions[q_num].title }}
+            </h4>
+            <p style="color: var(--gray-text); margin-bottom: 0.5rem;">
+                您的选择：
+                <span style="font-weight: bold; color: {{ analysis.label_info[answers[q_num]].color }};">
+                    {{ answers[q_num] }} - {{ analysis.label_info[answers[q_num]].name }}
+                </span>
+            </p>
+            <p style="font-size: 0.9rem;">
+                {{ scenario_questions[q_num].options[answers[q_num]][:100] }}...
+            </p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- 人才类型说明 -->
+<div class="card">
+    <div class="card-header">
+        <h2>📖 人才类型说明</h2>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
+        <div class="analysis-section" style="border-left: 4px solid #70AD47;">
+            <h4>D - 潜力综合管理人才 (≥5分)</h4>
+            <p>具备全局思维、高层协调、资源整合能力，追求双赢，具有高层管理潜力</p>
+        </div>
+        <div class="analysis-section" style="border-left: 4px solid #5B9BD5;">
+            <h4>C - 专业骨干/职能管理人才 (≥5分)</h4>
+            <p>注重客观、数据、专业，严谨专业判断，职能管理潜力</p>
+        </div>
+        <div class="analysis-section" style="border-left: 4px solid #FFC000;">
+            <h4>B - 业务攻坚/一线高潜力人才 (≥5分)</h4>
+            <p>以客户/目标为核心，愿意承担压力，一线高潜力</p>
+        </div>
+        <div class="analysis-section" style="border-left: 4px solid #FF6B6B;">
+            <h4>A - 激进执行类人才 (≥5分)</h4>
+            <p>激进执行，快速反应，执行导向</p>
+        </div>
+    </div>
+</div>
+
+<div style="text-align: center; margin-top: 2rem;">
+    <a href="{{ url_for('dashboard') }}" class="btn btn-primary">返回仪表盘</a>
+</div>
+{% endblock %}

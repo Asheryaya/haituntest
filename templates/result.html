@@ -92,6 +92,32 @@
     </div>
 </div>
 
+<!-- 每道题的选择详情 -->
+<div class="card">
+    <div class="card-header">
+        <h2>📝 答题详情</h2>
+    </div>
+
+    <div style="line-height: 2;">
+        {% for q_num in range(1, 41) %}
+        <div style="margin-bottom: 1rem; padding: 1rem; background-color: var(--light-bg); border-radius: 8px;">
+            <h4 style="color: var(--primary-color); margin-bottom: 0.5rem;">
+                第{{ q_num }}题：{{ disc_questions[q_num].question }}
+            </h4>
+            <p style="color: var(--gray-text); margin-bottom: 0.5rem;">
+                您的选择：
+                <span style="font-weight: bold; color: {% if disc_scoring_map[q_num][answers_detail[q_num]] == 'D' %}#FF6B6B{% elif disc_scoring_map[q_num][answers_detail[q_num]] == 'I' %}#FFC000{% elif disc_scoring_map[q_num][answers_detail[q_num]] == 'S' %}#70AD47{% else %}#5B9BD5{% endif %};">
+                    {{ answers_detail[q_num] }} - {{ disc_scoring_map[q_num][answers_detail[q_num]] }}型
+                </span>
+            </p>
+            <p style="font-size: 0.9rem;">
+                {{ disc_questions[q_num].options[answers_detail[q_num]] }}
+            </p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
 <!-- DISC类型说明 -->
 <div class="card">
     <div class="card-header">

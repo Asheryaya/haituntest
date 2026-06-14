@@ -55,7 +55,7 @@
             </div>
             <div style="margin-top: 1.5rem;">
                 {% if scenario_status == 'completed' %}
-                <span class="btn btn-success" style="opacity: 0.7; cursor: default;">已完成</span>
+                <a href="{{ url_for('scenario_result', assessment_id=scenario_assessment_id) }}" class="btn btn-success">查看结果</a>
                 {% elif scenario_status == 'in_progress' %}
                 <a href="{{ url_for('scenario_test', question=1) }}" class="btn btn-warning">继续答题</a>
                 {% else %}
